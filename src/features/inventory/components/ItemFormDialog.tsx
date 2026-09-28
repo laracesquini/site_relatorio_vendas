@@ -54,9 +54,11 @@ type ItemFormDialogProps = {
   onOpenChange: (open: boolean) => void
   /** Item being edited; omit to create one. */
   item?: InventoryItem
+  /** Called with the saved item's id (e.g. to select it in a purchase). */
+  onSaved?: (id: string) => void
 }
 
-export function ItemFormDialog({ open, onOpenChange, item }: ItemFormDialogProps) {
+export function ItemFormDialog({ open, onOpenChange, item, onSaved }: ItemFormDialogProps) {
   const units = useUnits()
   const categories = useCategoryOptions('material')
   const suppliers = useSuppliers()
@@ -91,7 +93,10 @@ export function ItemFormDialog({ open, onOpenChange, item }: ItemFormDialogProps
         ...(item ? {} : { initial_qty: v.initial_qty, initial_unit_cost: v.initial_unit_cost }),
       }),
     item ? 'Insumo atualizado' : 'Insumo cadastrado',
-    () => onOpenChange(false),
+    (id) => {
+      onOpenChange(false)
+      onSaved?.(id)
+    },
   )
 
   const optionalSelect = (

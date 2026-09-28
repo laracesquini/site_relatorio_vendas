@@ -12,6 +12,8 @@ type DecimalInputProps = Omit<ComponentProps<'input'>, 'value' | 'onChange' | 't
   prefix?: string
   /** Text shown inside the field on the right, e.g. "g". */
   suffix?: string
+  /** Classes for the wrapper; put width limits here so prefix/suffix stay inside. */
+  containerClassName?: string
 }
 
 /**
@@ -25,6 +27,7 @@ export function DecimalInput({
   prefix,
   suffix,
   className,
+  containerClassName,
   onBlur,
   onFocus,
   ...props
@@ -33,7 +36,7 @@ export function DecimalInput({
   const display = text ?? formatDecimalInput(value, fractionDigits)
 
   return (
-    <div className="relative">
+    <div className={cn('relative', containerClassName)}>
       {prefix && (
         <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground">
           {prefix}

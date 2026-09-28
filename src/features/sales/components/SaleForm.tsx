@@ -282,7 +282,7 @@ export function SaleForm({
                 fractionDigits={2}
                 value={field.value}
                 onChange={field.onChange}
-                className="sm:max-w-48"
+                containerClassName="sm:max-w-48"
               />
             )}
           />

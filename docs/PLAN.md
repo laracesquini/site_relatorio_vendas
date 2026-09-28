@@ -5,7 +5,7 @@ Web app to replace the spreadsheet used to manage a small 3D printing business: 
 - **UI language:** Brazilian Portuguese (pt-BR)
 - **Formats:** currency `R$ 1.234,56`, dates `DD/MM/YYYY`, time zone `America/Sao_Paulo`
 - **Status:** approved on 2026-09-28 with the default answers in [section 10](#10-decisions)
-- **Progress:** stages 0–7 done (setup, database, Configurações, Produtos, Nova venda, sales list, Dashboard, Estoque). Next: stage 8, Compras.
+- **Progress:** stages 0–8 done (setup, database, Configurações, Produtos, Nova venda, sales list, Dashboard, Estoque, Compras). Next: stage 9, Ficha de custo.
 
 ---
 

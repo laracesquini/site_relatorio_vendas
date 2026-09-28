@@ -24,12 +24,18 @@ export const useMovements = (filters: MovementFilters) =>
   })
 
 /** Everything that shows stock quantities or costs must refresh after a movement. */
+// Product costs (cost sheets) depend on material averages too.
 export const STOCK_QUERIES = [inventoryKeys.all, dashboardKeys.all, productKeys.all]
 
 export function useStockMutation<TVars, TResult>(
   mutationFn: (vars: TVars) => Promise<TResult>,
   successMessage: string | ((result: TResult, vars: TVars) => string),
-  onSuccess?: () => void,
+  onSuccess?: (result: TResult) => void,
 ) {
-  return useAppMutation({ mutationFn, invalidate: STOCK_QUERIES, successMessage, onSuccess })
+  return useAppMutation({
+    mutationFn,
+    invalidate: STOCK_QUERIES,
+    successMessage,
+    onSuccess: (result) => onSuccess?.(result),
+  })
 }

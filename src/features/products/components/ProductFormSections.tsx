@@ -206,7 +206,7 @@ export function StockSection({ form }: SectionProps) {
                   value={field.value}
                   onChange={field.onChange}
                   placeholder="0"
-                  className="sm:max-w-40"
+                  containerClassName="sm:max-w-40"
                 />
               )}
             />

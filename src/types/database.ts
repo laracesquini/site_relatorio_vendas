@@ -854,6 +854,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "stock_movements_purchase_item_fk"
+            columns: ["purchase_item_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_lines"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "stock_movements_reverses_movement_id_fkey"
             columns: ["reverses_movement_id"]
             isOneToOne: true
@@ -1010,6 +1017,63 @@ export type Database = {
           unit: string | null
         }
         Relationships: []
+      }
+      purchase_lines: {
+        Row: {
+          add_to_stock: boolean | null
+          category_id: string | null
+          category_name: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          inventory_item_id: string | null
+          inventory_item_name: string | null
+          is_operational: boolean | null
+          purchase_date: string | null
+          purchase_id: string | null
+          purchase_item_count: number | null
+          purchase_notes: string | null
+          purchase_total: number | null
+          quantity: number | null
+          stock_qty_per_unit: number | null
+          stock_quantity: number | null
+          stock_unit: string | null
+          stock_unit_cost: number | null
+          supplier_id: string | null
+          supplier_name: string | null
+          total_amount: number | null
+          unit_price: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_items_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_items_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchases_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sale_lines: {
         Row: {
