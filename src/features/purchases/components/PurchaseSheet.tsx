@@ -8,7 +8,14 @@ import { PurchaseForm } from './PurchaseForm'
 
 export type PurchaseSheetMode = { kind: 'new' } | { kind: 'edit'; purchaseId: string } | null
 
-export function PurchaseSheet({ mode, onClose }: { mode: PurchaseSheetMode; onClose: () => void }) {
+type PurchaseSheetProps = {
+  mode: PurchaseSheetMode
+  onClose: () => void
+  /** Called with the saved purchase's date. */
+  onSaved?: (purchaseDate: string) => void
+}
+
+export function PurchaseSheet({ mode, onClose, onSaved }: PurchaseSheetProps) {
   const editing = mode?.kind === 'edit'
   return (
     <Sheet open={mode !== null} onOpenChange={(open) => !open && onClose()}>
@@ -25,7 +32,10 @@ export function PurchaseSheet({ mode, onClose }: { mode: PurchaseSheetMode; onCl
           <PurchaseFormLoader
             key={mode.kind === 'edit' ? mode.purchaseId : 'new'}
             purchaseId={mode.kind === 'edit' ? mode.purchaseId : undefined}
-            onDone={onClose}
+            onDone={(date) => {
+              onClose()
+              onSaved?.(date)
+            }}
           />
         )}
       </SheetContent>
@@ -33,7 +43,7 @@ export function PurchaseSheet({ mode, onClose }: { mode: PurchaseSheetMode; onCl
   )
 }
 
-function PurchaseFormLoader({ purchaseId, onDone }: { purchaseId?: string; onDone: () => void }) {
+function PurchaseFormLoader({ purchaseId, onDone }: { purchaseId?: string; onDone: (date: string) => void }) {
   const items = useInventoryItems()
   const categories = useCategories()
   const suppliers = useSuppliers()

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resolvePeriod } from './period'
+import { isWithinRange, periodShowing, resolvePeriod } from './period'
 
 const today = '2026-09-28'
 
@@ -32,5 +32,15 @@ describe('resolvePeriod', () => {
       from: '2026-09-10',
       to: null,
     })
+  })
+})
+
+describe('periodShowing', () => {
+  it('keeps the current month, uses "Mês anterior" when it fits, otherwise that month', () => {
+    expect(periodShowing('2026-09-10', today)).toEqual({ period: 'thisMonth', customFrom: null, customTo: null })
+    expect(periodShowing('2026-08-31', today)).toEqual({ period: 'lastMonth', customFrom: null, customTo: null })
+    expect(periodShowing('2026-06-15', today)).toEqual({ period: 'custom', customFrom: '2026-06-01', customTo: '2026-06-30' })
+    expect(isWithinRange('2026-08-31', { from: '2026-09-01', to: '2026-09-30' })).toBe(false)
+    expect(isWithinRange('2026-08-31', { from: null, to: null })).toBe(true)
   })
 })

@@ -4,6 +4,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MemoryRouter } from 'react-router-dom'
 import type { ProductView, VariantView } from '@/features/products/model'
 import type { Channel } from '@/features/settings/api'
 import type { SaleLine } from '../api'
@@ -75,14 +76,16 @@ function renderForm(products: ProductView[] = [product()], onDone = vi.fn(), edi
   const client = new QueryClient()
   render(
     <QueryClientProvider client={client}>
-      <SaleForm
-        products={products}
-        recentProductIds={[]}
-        channels={channels}
-        initialChannelId="ml"
-        editing={editing}
-        onDone={onDone}
-      />
+      <MemoryRouter>
+        <SaleForm
+          products={products}
+          recentProductIds={[]}
+          channels={channels}
+          initialChannelId="ml"
+          editing={editing}
+          onDone={onDone}
+        />
+      </MemoryRouter>
     </QueryClientProvider>,
   )
   return { onDone, user: userEvent.setup() }

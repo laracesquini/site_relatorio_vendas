@@ -10,8 +10,10 @@ import { PageHeader } from '@/components/PageHeader'
 import { PeriodFilter } from '@/components/PeriodFilter'
 import { ErrorState, LoadingRows } from '@/components/QueryState'
 import { RowActions } from '@/components/RowActions'
+import { toast } from 'sonner'
+import { isWithinRange, periodShowing } from '@/domain/period'
 import { useAppMutation } from '@/lib/api'
-import { formatCurrency, formatDate, formatQuantity, formatUnitCost } from '@/lib/format'
+import { formatCurrency, formatDate, formatMonthLong, formatQuantity, formatUnitCost, todayISO } from '@/lib/format'
 import { usePeriodParams } from '@/lib/usePeriodParams'
 import { dashboardKeys } from '@/features/dashboard/api'
 import { reportKeys } from '@/features/reports/api'
@@ -50,6 +52,13 @@ export default function PurchasesPage() {
   const visible = useMemo(() => searchPurchaseLines(lines.data ?? [], term), [lines.data, term])
   const totals = useMemo(() => sumPurchases(visible), [visible])
   const openNew = () => setSheet({ kind: 'new' })
+
+  // A purchase dated outside the period on screen would seem to vanish: switch to its month.
+  function showSaved(date: string) {
+    if (isWithinRange(date, period.range)) return
+    period.update(periodShowing(date, todayISO()))
+    toast.info(`A compra é de ${formatDate(date)}. Mostrando ${formatMonthLong(date.slice(0, 7) + '-01')}.`)
+  }
 
   return (
     <>
@@ -105,7 +114,7 @@ export default function PurchasesPage() {
                 <EmptyState
                   icon={ShoppingCart}
                   title="Nenhuma compra no período"
-                  description="Registre filamentos, argolas, embalagens e despesas como anúncios e frete."
+                  description="Registre filamentos, argolas, embalagens e despesas como anúncios e frete. Compras de outros meses aparecem ao mudar o período acima."
                   action={
                     <Button onClick={openNew}>
                       <Plus /> Nova compra
@@ -178,7 +187,7 @@ export default function PurchasesPage() {
         )}
       </div>
 
-      <PurchaseSheet mode={sheet} onClose={() => setSheet(null)} />
+      <PurchaseSheet mode={sheet} onClose={() => setSheet(null)} onSaved={showSaved} />
       <ConfirmDialog
         open={deleting !== null}
         onOpenChange={(open) => !open && setDeleting(null)}

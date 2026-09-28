@@ -44,3 +44,25 @@ export function resolvePeriod(preset: PeriodPreset, today: string, custom: DateR
 
 export const isPeriodPreset = (value: string | null): value is PeriodPreset =>
   value !== null && value in PERIOD_LABELS
+
+/** True when `date` (YYYY-MM-DD) falls inside the range; open ends match anything. */
+export const isWithinRange = (date: string, range: DateRange) =>
+  (!range.from || date >= range.from) && (!range.to || date <= range.to)
+
+/**
+ * Period that shows a given date's whole month, e.g. after saving a record dated
+ * outside the current filter: "Mês anterior" when it fits, otherwise that month.
+ */
+export function periodShowing(
+  date: string,
+  today: string,
+): { period: PeriodPreset; customFrom: string | null; customTo: string | null } {
+  if (isWithinRange(date, resolvePeriod('thisMonth', today))) {
+    return { period: 'thisMonth', customFrom: null, customTo: null }
+  }
+  if (isWithinRange(date, resolvePeriod('lastMonth', today))) {
+    return { period: 'lastMonth', customFrom: null, customTo: null }
+  }
+  const month = resolvePeriod('thisMonth', date)
+  return { period: 'custom', customFrom: month.from, customTo: month.to }
+}

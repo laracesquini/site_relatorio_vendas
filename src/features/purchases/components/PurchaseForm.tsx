@@ -35,7 +35,8 @@ type PurchaseFormProps = {
   items: InventoryItem[]
   categories: Category[]
   suppliers: Supplier[]
-  onDone: () => void
+  /** Called after saving, with the purchase date (the list may need to show it). */
+  onDone: (purchaseDate: string) => void
 }
 
 export function PurchaseForm({ initial, purchaseId, items, categories, suppliers, onDone }: PurchaseFormProps) {
@@ -53,7 +54,7 @@ export function PurchaseForm({ initial, purchaseId, items, categories, suppliers
       purchaseId ? updatePurchase(purchaseId, toPurchasePayload(v)) : registerPurchase(toPurchasePayload(v)),
     invalidate: [purchaseKeys.all, inventoryKeys.all, dashboardKeys.all, reportKeys.all, productKeys.all],
     successMessage: purchaseId ? 'Compra atualizada' : 'Compra registrada',
-    onSuccess: onDone,
+    onSuccess: (_, v) => onDone(v.purchase_date),
   })
 
   const itemsError = form.formState.errors.items?.message ?? form.formState.errors.items?.root?.message

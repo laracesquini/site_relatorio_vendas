@@ -1,7 +1,9 @@
 import { useMemo, useRef, useState } from 'react'
 import { Controller, useForm, useWatch, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from 'react-router-dom'
 import { AlertTriangle, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -11,8 +13,9 @@ import { Field } from '@/components/Field'
 import { SwitchField } from '@/components/SwitchField'
 import { calculateSale } from '@/domain/sale'
 import { dec, roundMoney } from '@/domain/decimal'
+import { isWithinRange, periodShowing, resolvePeriod } from '@/domain/period'
 import { useAppMutation } from '@/lib/api'
-import { formatCurrency, formatPercent } from '@/lib/format'
+import { formatCurrency, formatDate, formatPercent, todayISO } from '@/lib/format'
 import { dashboardKeys } from '@/features/dashboard/api'
 import { reportKeys } from '@/features/reports/api'
 import { inventoryKeys } from '@/features/inventory/api'
@@ -90,8 +93,8 @@ export function SaleForm({
     mutationFn: (v: SaleFormValues) =>
       editing ? updateSale(editing.sale_id!, toCreateSalePayload(v)) : createSale(toCreateSalePayload(v)),
     invalidate: [salesKeys.all, productKeys.all, dashboardKeys.all, reportKeys.all, inventoryKeys.all],
-    successMessage: editing ? 'Venda atualizada' : 'Venda registrada',
     onSuccess: (_, v) => {
+      announceSaved(v.sale_date)
       if (!editing) storeLastChannel(v.channel_id)
       if (editing || submitMode.current === 'close') {
         onDone()
@@ -103,6 +106,27 @@ export function SaleForm({
       requestAnimationFrame(() => pickerRef.current?.focus())
     },
   })
+
+  const navigate = useNavigate()
+
+  // Lists open on the current month; a sale dated earlier would seem to vanish,
+  // so say where it is and offer to open that period.
+  function announceSaved(saleDate: string) {
+    const title = editing ? 'Venda atualizada' : 'Venda registrada'
+    const today = todayISO()
+    if (isWithinRange(saleDate, resolvePeriod('thisMonth', today))) {
+      toast.success(title)
+      return
+    }
+    const p = periodShowing(saleDate, today)
+    const params = new URLSearchParams({ periodo: p.period })
+    if (p.customFrom) params.set('de', p.customFrom)
+    if (p.customTo) params.set('ate', p.customTo)
+    toast.success(title, {
+      description: `Data da venda: ${formatDate(saleDate)}, fora do mês atual.`,
+      action: { label: 'Ver', onClick: () => navigate(`/vendas?${params}`) },
+    })
+  }
 
   function applyVariant(v: VariantView | undefined, qty: number | null, touched = grossTouched) {
     form.setValue('variant_id', v?.id ?? null, { shouldValidate: form.formState.isSubmitted })
