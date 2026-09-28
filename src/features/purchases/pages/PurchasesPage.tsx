@@ -14,6 +14,7 @@ import { useAppMutation } from '@/lib/api'
 import { formatCurrency, formatDate, formatQuantity, formatUnitCost } from '@/lib/format'
 import { usePeriodParams } from '@/lib/usePeriodParams'
 import { dashboardKeys } from '@/features/dashboard/api'
+import { reportKeys } from '@/features/reports/api'
 import { inventoryKeys } from '@/features/inventory/api'
 import { productKeys } from '@/features/products/api'
 import { deletePurchase, purchaseKeys, type PurchaseLine } from '../api'
@@ -41,7 +42,7 @@ export default function PurchasesPage() {
 
   const remove = useAppMutation({
     mutationFn: (l: PurchaseLine) => deletePurchase(l.purchase_id!),
-    invalidate: [purchaseKeys.all, inventoryKeys.all, dashboardKeys.all, productKeys.all],
+    invalidate: [purchaseKeys.all, inventoryKeys.all, dashboardKeys.all, reportKeys.all, productKeys.all],
     successMessage: 'Compra excluída',
     onSuccess: () => setDeleting(null),
   })

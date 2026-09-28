@@ -73,8 +73,10 @@ export function formatDate(value: string | Date | null | undefined) {
 
 const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
 
-/** '2026-09-02' → 02/09 (day) or set/26 (month). */
-export function formatBucket(value: string, bucket: 'day' | 'month') {
+export type Bucket = 'day' | 'week' | 'month'
+
+/** Axis label: '2026-09-02' → 02/09 (day or week start) or set/26 (month). */
+export function formatBucket(value: string, bucket: Bucket) {
   const [y, m, d] = value.slice(0, 10).split('-')
   return bucket === 'month' ? `${MONTHS[Number(m) - 1]}/${y.slice(2)}` : `${d}/${m}`
 }
@@ -85,6 +87,13 @@ export function formatMonthLong(value: string) {
   return new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
     new Date(Date.UTC(y, m - 1, 1)),
   )
+}
+
+/** Full name of a bucket: 02/09/2026, semana de 31/08/2026, setembro de 2026. */
+export function formatBucketTitle(value: string, bucket: Bucket) {
+  if (bucket === 'month') return formatMonthLong(value)
+  if (bucket === 'week') return `semana de ${formatDate(value)}`
+  return formatDate(value)
 }
 
 /** 28/09/2026 14:05 */

@@ -11,6 +11,7 @@ import { purchaseTotal } from '@/domain/stock'
 import { useAppMutation } from '@/lib/api'
 import { formatCurrency, todayISO } from '@/lib/format'
 import { dashboardKeys } from '@/features/dashboard/api'
+import { reportKeys } from '@/features/reports/api'
 import { inventoryKeys, type InventoryItem } from '@/features/inventory/api'
 import { productKeys } from '@/features/products/api'
 import { ItemFormDialog } from '@/features/inventory/components/ItemFormDialog'
@@ -50,7 +51,7 @@ export function PurchaseForm({ initial, purchaseId, items, categories, suppliers
   const save = useAppMutation({
     mutationFn: (v: PurchaseFormValues) =>
       purchaseId ? updatePurchase(purchaseId, toPurchasePayload(v)) : registerPurchase(toPurchasePayload(v)),
-    invalidate: [purchaseKeys.all, inventoryKeys.all, dashboardKeys.all, productKeys.all],
+    invalidate: [purchaseKeys.all, inventoryKeys.all, dashboardKeys.all, reportKeys.all, productKeys.all],
     successMessage: purchaseId ? 'Compra atualizada' : 'Compra registrada',
     onSuccess: onDone,
   })

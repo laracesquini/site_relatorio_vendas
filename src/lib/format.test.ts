@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   formatBucket,
+  formatBucketTitle,
   formatCurrency,
   formatCurrencyCompact,
   formatDate,
@@ -50,6 +51,8 @@ describe('format', () => {
     expect(formatBucket('2026-09-02', 'day')).toBe('02/09')
     expect(formatBucket('2026-09-01', 'month')).toBe('set/26')
     expect(formatMonthLong('2026-09-01')).toBe('setembro de 2026')
+    expect(formatBucketTitle('2026-08-31', 'week')).toBe('semana de 31/08/2026')
+    expect(formatBucketTitle('2026-09-02', 'day')).toBe('02/09/2026')
   })
 
   it('keeps up to 4 decimals for unit costs', () => {

@@ -1369,6 +1369,14 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      report_cash_flow: {
+        Args: { p_bucket?: string; p_from?: string; p_to?: string }
+        Returns: Json
+      }
+      report_details: {
+        Args: { p_bucket?: string; p_from?: string; p_to?: string }
+        Returns: Json
+      }
       report_overview: {
         Args: { p_from?: string; p_to?: string }
         Returns: Json
