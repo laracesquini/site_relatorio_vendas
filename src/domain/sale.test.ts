@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculateSale } from './sale'
+import { calculateSale, sumSales } from './sale'
 
 describe('calculateSale', () => {
   it('matches the spec example: R$ 30,00 → R$ 19,40 with R$ 10,90 cost', () => {
@@ -58,5 +58,33 @@ describe('calculateSale', () => {
   it('treats empty fields as zero while the form is being filled', () => {
     const s = calculateSale({ gross: null, received: undefined, unitCost: null, quantity: null })
     expect(s).toMatchObject({ gross: 0, received: 0, totalCost: 0, profit: 0, quantity: 0 })
+  })
+})
+
+describe('sumSales', () => {
+  const line = (gross: number, received: number, cost: number, quantity = 1) => ({
+    quantity,
+    gross_amount: gross,
+    received_amount: received,
+    fees: roundDiff(gross, received),
+    total_cost: cost,
+    profit: roundDiff(received, cost),
+  })
+  const roundDiff = (a: number, b: number) => Math.round((a - b) * 100) / 100
+
+  it('adds up the snapshots and computes the weighted margin', () => {
+    const t = sumSales([line(30, 19.4, 10.9), line(20, 20, 5, 2)])
+    expect(t).toMatchObject({ lines: 2, units: 3, gross: 50, received: 39.4, fees: 10.6, cost: 15.9, profit: 23.5 })
+    // 23.5 / 39.4, not the average of 43.81% and 75%
+    expect(t.margin).toBe(59.64)
+  })
+
+  it('sums cents exactly', () => {
+    const t = sumSales(Array.from({ length: 10 }, () => line(0.1, 0.1, 0)))
+    expect(t.gross).toBe(1)
+  })
+
+  it('returns zeros and no margin for an empty list', () => {
+    expect(sumSales([])).toMatchObject({ lines: 0, gross: 0, profit: 0, margin: null })
   })
 })

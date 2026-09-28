@@ -16,10 +16,11 @@ import { formatCurrency, formatPercent } from '@/lib/format'
 import { productKeys } from '@/features/products/api'
 import type { ProductView, VariantView } from '@/features/products/model'
 import type { Channel } from '@/features/settings/api'
-import { createSale, salesKeys } from '../api'
+import { createSale, salesKeys, updateSale, type SaleLine } from '../api'
 import { storeLastChannel } from '../lastChannel'
 import {
   emptySaleForm,
+  fromSaleLine,
   saleFormSchema,
   toCreateSalePayload,
   type SaleFormState,
@@ -28,11 +29,13 @@ import {
 import { ProductPicker } from './ProductPicker'
 import { SaleSummaryCard } from './SaleSummaryCard'
 
-type NewSaleFormProps = {
+type SaleFormProps = {
   products: ProductView[]
   recentProductIds: string[]
   channels: Channel[]
   initialChannelId: string | null
+  /** The sale being edited; omit to register a new one. */
+  editing?: SaleLine
   onDone: () => void
 }
 
@@ -42,20 +45,32 @@ const COST_SOURCE_HINT = {
   estimate: 'custo estimado do produto',
 } as const
 
-export function NewSaleForm({ products, recentProductIds, channels, initialChannelId, onDone }: NewSaleFormProps) {
+export function SaleForm({
+  products,
+  recentProductIds,
+  channels,
+  initialChannelId,
+  editing,
+  onDone,
+}: SaleFormProps) {
   const form = useForm<SaleFormState, unknown, SaleFormValues>({
     resolver: zodResolver(saleFormSchema) as unknown as Resolver<SaleFormState, unknown, SaleFormValues>,
-    defaultValues: emptySaleForm(initialChannelId),
+    defaultValues: editing ? fromSaleLine(editing) : emptySaleForm(initialChannelId),
   })
   const { errors } = form.formState
   const pickerRef = useRef<HTMLButtonElement>(null)
   const submitMode = useRef<'close' | 'another'>('close')
-  // Once the user types a gross price, stop recalculating it from price × quantity.
-  const [grossTouched, setGrossTouched] = useState(false)
+  // Once the user types a gross price (or edits a saved sale), stop
+  // recalculating it from price × quantity.
+  const [grossTouched, setGrossTouched] = useState(Boolean(editing))
 
   const values = useWatch({ control: form.control })
   const product = products.find((p) => p.id === values.product_id)
-  const activeVariants = useMemo(() => product?.variants.filter((v) => v.isActive) ?? [], [product])
+  // The sale's own variant stays selectable even if it was deactivated since.
+  const activeVariants = useMemo(
+    () => product?.variants.filter((v) => v.isActive || v.id === editing?.variant_id) ?? [],
+    [product, editing?.variant_id],
+  )
   const variant = activeVariants.find((v) => v.id === values.variant_id)
   const summary = calculateSale({
     gross: values.gross_amount,
@@ -68,12 +83,13 @@ export function NewSaleForm({ products, recentProductIds, channels, initialChann
     product?.stockMode === 'stocked' && variant !== undefined && quantity > variant.currentQty
 
   const save = useAppMutation({
-    mutationFn: (v: SaleFormValues) => createSale(toCreateSalePayload(v)),
+    mutationFn: (v: SaleFormValues) =>
+      editing ? updateSale(editing.sale_id!, toCreateSalePayload(v)) : createSale(toCreateSalePayload(v)),
     invalidate: [salesKeys.all, productKeys.all],
-    successMessage: 'Venda registrada',
+    successMessage: editing ? 'Venda atualizada' : 'Venda registrada',
     onSuccess: (_, v) => {
-      storeLastChannel(v.channel_id)
-      if (submitMode.current === 'close') {
+      if (!editing) storeLastChannel(v.channel_id)
+      if (editing || submitMode.current === 'close') {
         onDone()
         return
       }
@@ -246,7 +262,13 @@ export function NewSaleForm({ products, recentProductIds, channels, initialChann
           label="Custo unitário de produção"
           htmlFor="unit_cost"
           error={errors.unit_cost?.message}
-          hint={variant ? `Carregado do ${COST_SOURCE_HINT[variant.costSource]}; ajuste se esta peça saiu diferente.` : undefined}
+          hint={
+            editing && variant?.id === editing.variant_id
+              ? 'Custo registrado na venda. Mudanças posteriores no produto não o alteram.'
+              : variant
+                ? `Carregado do ${COST_SOURCE_HINT[variant.costSource]}; ajuste se esta peça saiu diferente.`
+                : undefined
+          }
         >
           <Controller
             control={form.control}
@@ -304,17 +326,19 @@ export function NewSaleForm({ products, recentProductIds, channels, initialChann
           </span>
         </div>
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button
-            type="submit"
-            variant="outline"
-            disabled={save.isPending}
-            onClick={() => (submitMode.current = 'another')}
-          >
-            Salvar e registrar outra
-          </Button>
+          {!editing && (
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={save.isPending}
+              onClick={() => (submitMode.current = 'another')}
+            >
+              Salvar e registrar outra
+            </Button>
+          )}
           <Button type="submit" disabled={save.isPending} onClick={() => (submitMode.current = 'close')}>
             {save.isPending && <Loader2 className="animate-spin" />}
-            Salvar venda
+            {editing ? 'Salvar alterações' : 'Salvar venda'}
           </Button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { todayISO } from '@/lib/format'
-import type { CreateSalePayload } from './api'
+import type { CreateSalePayload, SaleLine } from './api'
 
 const required = (message: string) => z.string({ error: message }).min(1, message)
 const amount = (message: string) =>
@@ -57,6 +57,23 @@ export function emptySaleForm(channelId: string | null, saleDate = todayISO()): 
     is_customized: false,
     customization_notes: '',
     notes: '',
+  }
+}
+
+/** Form values for editing a saved (single-item) sale, with its frozen cost. */
+export function fromSaleLine(line: SaleLine): SaleFormState {
+  return {
+    product_id: line.product_id,
+    variant_id: line.variant_id,
+    quantity: line.quantity,
+    channel_id: line.channel_id,
+    sale_date: line.sale_date ?? todayISO(),
+    gross_amount: line.gross_amount,
+    received_amount: line.received_amount,
+    unit_cost: line.unit_cost,
+    is_customized: Boolean(line.is_customized),
+    customization_notes: line.customization_notes ?? '',
+    notes: line.notes ?? '',
   }
 }
 

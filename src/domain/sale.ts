@@ -64,3 +64,52 @@ export function calculateSale(input: SaleCalcInput): SaleSummary {
     receivedExceedsGross: received.greaterThan(gross),
   }
 }
+
+export type SaleAmounts = {
+  quantity: number | null
+  gross_amount: number | null
+  received_amount: number | null
+  fees: number | null
+  total_cost: number | null
+  profit: number | null
+}
+
+export type SalesTotals = {
+  lines: number
+  units: number
+  gross: number
+  received: number
+  fees: number
+  cost: number
+  profit: number
+  /** Total profit over total received, in percent (weighted, not an average of margins). */
+  margin: number | null
+}
+
+/** Totals of saved sale lines, using their stored snapshots. */
+export function sumSales(lines: SaleAmounts[]): SalesTotals {
+  let gross = dec(0)
+  let received = dec(0)
+  let fees = dec(0)
+  let cost = dec(0)
+  let profit = dec(0)
+  let units = 0
+  for (const l of lines) {
+    gross = gross.plus(l.gross_amount ?? 0)
+    received = received.plus(l.received_amount ?? 0)
+    fees = fees.plus(l.fees ?? 0)
+    cost = cost.plus(l.total_cost ?? 0)
+    profit = profit.plus(l.profit ?? 0)
+    units += l.quantity ?? 0
+  }
+  return {
+    lines: lines.length,
+    units,
+    gross: gross.toNumber(),
+    received: received.toNumber(),
+    fees: fees.toNumber(),
+    cost: cost.toNumber(),
+    profit: profit.toNumber(),
+    margin: percentOf(profit, received),
+  }
+}

@@ -598,6 +598,7 @@ export type Database = {
           unit_cost: number
           unit_price: number
           updated_at: string
+          variant_attributes: Json
           variant_id: string
           variant_label: string | null
         }
@@ -619,6 +620,7 @@ export type Database = {
           unit_cost: number
           unit_price: number
           updated_at?: string
+          variant_attributes?: Json
           variant_id: string
           variant_label?: string | null
         }
@@ -640,6 +642,7 @@ export type Database = {
           unit_cost?: number
           unit_price?: number
           updated_at?: string
+          variant_attributes?: Json
           variant_id?: string
           variant_label?: string | null
         }
@@ -991,6 +994,7 @@ export type Database = {
       sale_lines: {
         Row: {
           category_id: string | null
+          category_name: string | null
           channel_id: string | null
           channel_name: string | null
           created_at: string | null
@@ -1008,11 +1012,13 @@ export type Database = {
           received_amount: number | null
           sale_date: string | null
           sale_id: string | null
+          sale_item_count: number | null
           sku: string | null
           source: string | null
           total_cost: number | null
           unit_cost: number | null
           unit_price: number | null
+          variant_attributes: Json | null
           variant_id: string | null
           variant_label: string | null
         }

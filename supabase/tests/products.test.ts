@@ -140,3 +140,24 @@ describe('delete_product', () => {
     await expect(t.db.query('select delete_product($1)', [id])).rejects.toThrow(/Arquive/)
   })
 })
+
+describe('sale attribute snapshot', () => {
+  it('stores Cor and Tamanho separately and keeps them after the product changes', async () => {
+    const azul = await value('Cor', 'Azul')
+    const pequeno = await value('Tamanho', 'Pequeno')
+    const rosa = await value('Cor', 'Rosa')
+    const id = await save({ ...base, variants: [{ sku: 'PET-AZ-P', value_ids: [azul, pequeno] }] })
+    const [v] = await variants(id)
+    const saleId = await sell(t, await channelId(t, 'Shopee'), 20, [
+      { variant_id: v.id, quantity: 1, gross_amount: 25 },
+    ])
+    await save({ ...base, id, variants: [{ id: v.id, sku: 'PET-AZ-P', value_ids: [rosa, pequeno] }] })
+
+    const line = await t.one<{ variant_attributes: Record<string, string>; sale_item_count: number }>(
+      'select variant_attributes, sale_item_count from sale_lines where sale_id = $1',
+      [saleId],
+    )
+    expect(line.variant_attributes).toEqual({ Cor: 'Azul', Tamanho: 'Pequeno' })
+    expect(line.sale_item_count).toBe(1)
+  })
+})

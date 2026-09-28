@@ -6,15 +6,18 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ProductView, VariantView } from '@/features/products/model'
 import type { Channel } from '@/features/settings/api'
+import type { SaleLine } from '../api'
 
 vi.mock('@/lib/supabase', () => ({ supabase: {} }))
 const createSale = vi.fn()
+const updateSale = vi.fn()
 vi.mock('../api', () => ({
   createSale: (p: unknown) => createSale(p),
+  updateSale: (id: string, p: unknown) => updateSale(id, p),
   salesKeys: { all: ['sales'] },
 }))
 
-const { NewSaleForm } = await import('./NewSaleForm')
+const { SaleForm } = await import('./SaleForm')
 
 beforeAll(() => {
   // APIs used by Radix/cmdk that happy-dom does not implement.
@@ -28,6 +31,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   createSale.mockReset().mockResolvedValue('sale-id')
+  updateSale.mockReset().mockResolvedValue('sale-id')
 })
 afterEach(cleanup)
 
@@ -67,15 +71,16 @@ const channels = [
   { id: 'pessoal', name: 'Pessoal', is_active: true },
 ] as Channel[]
 
-function renderForm(products: ProductView[] = [product()], onDone = vi.fn()) {
+function renderForm(products: ProductView[] = [product()], onDone = vi.fn(), editing?: SaleLine) {
   const client = new QueryClient()
   render(
     <QueryClientProvider client={client}>
-      <NewSaleForm
+      <SaleForm
         products={products}
         recentProductIds={[]}
         channels={channels}
         initialChannelId="ml"
+        editing={editing}
         onDone={onDone}
       />
     </QueryClientProvider>,
@@ -90,7 +95,7 @@ async function pickProduct(user: ReturnType<typeof userEvent.setup>, name: strin
   await user.click(await screen.findByText(name))
 }
 
-describe('NewSaleForm', () => {
+describe('SaleForm', () => {
   it('loads price and cost from the product and shows the live summary', async () => {
     const { user } = renderForm()
     await pickProduct(user, 'Luminária Lua')
@@ -198,5 +203,65 @@ describe('NewSaleForm', () => {
     ])
     await pickProduct(user, 'Fidget Estrela')
     expect(screen.getByText(/estoque ficará negativo/)).toBeInTheDocument()
+  })
+})
+
+describe('SaleForm (editing)', () => {
+  // Sold for R$ 30 at a cost of R$ 10,90; the product now costs R$ 14 and sells for R$ 35.
+  const saved = {
+    id: 'item-1',
+    sale_id: 'sale-1',
+    product_id: 'p1',
+    variant_id: 'v1',
+    channel_id: 'pessoal',
+    sale_date: '2026-09-05',
+    quantity: 1,
+    gross_amount: 30,
+    received_amount: 19.4,
+    unit_cost: 10.9,
+    is_customized: false,
+    customization_notes: null,
+    notes: 'Cliente antiga',
+    sale_item_count: 1,
+  } as SaleLine
+  const changedProduct = product({ variants: [variant({ price: 35, unitCost: 14 })] })
+
+  it('opens with the saved values and the frozen cost, not the current ones', () => {
+    renderForm([changedProduct], vi.fn(), saved)
+    expect(screen.getByLabelText('Preço bruto')).toHaveValue('30,00')
+    expect(screen.getByLabelText('Custo unitário de produção')).toHaveValue('10,90')
+    expect(screen.getByLabelText('Data')).toHaveValue('2026-09-05')
+    expect(screen.getByText(/Custo registrado na venda/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Salvar e registrar outra' })).not.toBeInTheDocument()
+  })
+
+  it('keeps the saved gross price when the quantity changes', async () => {
+    const { user } = renderForm([changedProduct], vi.fn(), saved)
+    const qty = screen.getByLabelText('Quantidade')
+    await user.clear(qty)
+    await user.type(qty, '2')
+    expect(screen.getByLabelText('Preço bruto')).toHaveValue('30,00')
+    expect(summary().getByText('Custo').nextSibling).toHaveTextContent('R$ 21,80')
+  })
+
+  it('updates the same sale with the edited values', async () => {
+    const { user, onDone } = renderForm([changedProduct], vi.fn(), saved)
+    const received = screen.getByLabelText('Valor recebido')
+    await user.clear(received)
+    await user.type(received, '20')
+    await user.click(screen.getByRole('button', { name: 'Salvar alterações' }))
+
+    await waitFor(() => expect(updateSale).toHaveBeenCalledTimes(1))
+    const [id, payload] = updateSale.mock.calls[0]
+    expect(id).toBe('sale-1')
+    expect(payload).toMatchObject({
+      channel_id: 'pessoal',
+      sale_date: '2026-09-05',
+      received_amount: 20,
+      notes: 'Cliente antiga',
+      items: [{ variant_id: 'v1', gross_amount: 30, unit_cost: 10.9 }],
+    })
+    expect(createSale).not.toHaveBeenCalled()
+    await waitFor(() => expect(onDone).toHaveBeenCalled())
   })
 })

@@ -3,22 +3,22 @@ import { Outlet } from 'react-router-dom'
 import { Menu, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
-import { NewSaleProvider } from '@/features/sales/components/NewSaleProvider'
-import { useNewSale } from '@/features/sales/new-sale-context'
+import { SaleSheetProvider } from '@/features/sales/components/SaleSheetProvider'
+import { useSaleSheet } from '@/features/sales/sale-sheet-context'
 import { SidebarNav } from './SidebarNav'
 import { UserMenu } from './UserMenu'
 
 export function AppLayout() {
   return (
-    <NewSaleProvider>
+    <SaleSheetProvider>
       <Shell />
-    </NewSaleProvider>
+    </SaleSheetProvider>
   )
 }
 
 function Shell() {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { openNewSale } = useNewSale()
+  const { openNewSale } = useSaleSheet()
 
   return (
     <div className="min-h-svh bg-background">
