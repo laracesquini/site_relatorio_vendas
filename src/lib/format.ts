@@ -35,6 +35,19 @@ export function formatCurrency(value: Numeric) {
   return n === null ? '—' : currency.format(n)
 }
 
+const unitCost = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 4,
+})
+
+/** Cost per unit keeps up to 4 decimals: R$ 0,1139 (per gram), R$ 9,9975. */
+export function formatUnitCost(value: Numeric) {
+  const n = toNumber(value)
+  return n === null ? '—' : unitCost.format(n)
+}
+
 /** 43,81% — expects a value already in percent (43.81, not 0.4381). */
 export function formatPercent(value: Numeric) {
   const n = toNumber(value)

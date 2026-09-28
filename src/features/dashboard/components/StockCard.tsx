@@ -72,7 +72,7 @@ export function StockCard() {
               ))}
             </ul>
             {items.length > 8 && (
-              <Link to="/estoque" className="mt-2 inline-block text-sm underline underline-offset-2">
+              <Link to="/estoque?aba=insumos" className="mt-2 inline-block text-sm underline underline-offset-2">
                 Ver todos os {items.length} itens
               </Link>
             )}

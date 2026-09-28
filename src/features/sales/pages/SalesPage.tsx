@@ -9,6 +9,7 @@ import { sumSales } from '@/domain/sale'
 import { useAppMutation } from '@/lib/api'
 import { formatCurrency, formatDate } from '@/lib/format'
 import { dashboardKeys } from '@/features/dashboard/api'
+import { inventoryKeys } from '@/features/inventory/api'
 import { productKeys } from '@/features/products/api'
 import { useProducts } from '@/features/products/hooks'
 import { useCategoryOptions, useChannels } from '@/features/settings/hooks'
@@ -34,7 +35,7 @@ export default function SalesPage() {
 
   const remove = useAppMutation({
     mutationFn: (l: SaleLine) => deleteSale(l.sale_id!),
-    invalidate: [salesKeys.all, productKeys.all, dashboardKeys.all],
+    invalidate: [salesKeys.all, productKeys.all, dashboardKeys.all, inventoryKeys.all],
     successMessage: 'Venda excluída',
     onSuccess: () => setDeleting(null),
   })

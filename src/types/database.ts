@@ -857,6 +857,13 @@ export type Database = {
             foreignKeyName: "stock_movements_reverses_movement_id_fkey"
             columns: ["reverses_movement_id"]
             isOneToOne: true
+            referencedRelation: "stock_movement_history"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_reverses_movement_id_fkey"
+            columns: ["reverses_movement_id"]
+            isOneToOne: true
             referencedRelation: "stock_movements"
             referencedColumns: ["id"]
           },
@@ -1080,6 +1087,91 @@ export type Database = {
           },
         ]
       }
+      stock_movement_history: {
+        Row: {
+          avg_cost_after: number | null
+          balance_after: number | null
+          created_at: string | null
+          created_by: string | null
+          id: string | null
+          inventory_item_id: string | null
+          item_name: string | null
+          kind: string | null
+          movement_type: string | null
+          notes: string | null
+          occurred_at: string | null
+          product_variant_id: string | null
+          production_id: string | null
+          purchase_description: string | null
+          purchase_id: string | null
+          quantity: number | null
+          reason: string | null
+          reverses_movement_id: string | null
+          sale_id: string | null
+          sale_product_name: string | null
+          unit: string | null
+          unit_cost: number | null
+          variant_label: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_items_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_product_variant_id_fkey"
+            columns: ["product_variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_product_variant_id_fkey"
+            columns: ["product_variant_id"]
+            isOneToOne: false
+            referencedRelation: "variant_costs"
+            referencedColumns: ["variant_id"]
+          },
+          {
+            foreignKeyName: "stock_movements_production_id_fkey"
+            columns: ["production_id"]
+            isOneToOne: false
+            referencedRelation: "productions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_reverses_movement_id_fkey"
+            columns: ["reverses_movement_id"]
+            isOneToOne: true
+            referencedRelation: "stock_movement_history"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_reverses_movement_id_fkey"
+            columns: ["reverses_movement_id"]
+            isOneToOne: true
+            referencedRelation: "stock_movements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stock_value: {
         Row: {
           finished_products: number | null
@@ -1108,6 +1200,40 @@ export type Database = {
       }
     }
     Functions: {
+      adjust_stock_to: {
+        Args: {
+          p_counted: number
+          p_inventory_item_id?: string
+          p_notes?: string
+          p_occurred_at?: string
+          p_product_variant_id?: string
+        }
+        Returns: {
+          avg_cost_after: number
+          balance_after: number
+          created_at: string
+          created_by: string | null
+          id: string
+          inventory_item_id: string | null
+          movement_type: string
+          notes: string | null
+          occurred_at: string
+          product_variant_id: string | null
+          production_id: string | null
+          purchase_item_id: string | null
+          quantity: number
+          reason: string
+          reverses_movement_id: string | null
+          sale_item_id: string | null
+          unit_cost: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "stock_movements"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       create_sale: { Args: { p: Json }; Returns: string }
       delete_product: { Args: { p_product_id: string }; Returns: undefined }
       delete_production: {
@@ -1183,6 +1309,7 @@ export type Database = {
         Args: { p_from?: string; p_to?: string }
         Returns: Json
       }
+      save_inventory_item: { Args: { p: Json }; Returns: string }
       save_product: { Args: { p: Json }; Returns: string }
       update_purchase: {
         Args: { p: Json; p_purchase_id: string }

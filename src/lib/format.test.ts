@@ -7,6 +7,7 @@ import {
   formatMonthLong,
   formatPercent,
   formatQuantity,
+  formatUnitCost,
   todayISO,
 } from './format'
 
@@ -49,5 +50,11 @@ describe('format', () => {
     expect(formatBucket('2026-09-02', 'day')).toBe('02/09')
     expect(formatBucket('2026-09-01', 'month')).toBe('set/26')
     expect(formatMonthLong('2026-09-01')).toBe('setembro de 2026')
+  })
+
+  it('keeps up to 4 decimals for unit costs', () => {
+    expect(plain(formatUnitCost(0.1139))).toBe('R$ 0,1139')
+    expect(plain(formatUnitCost(0.34))).toBe('R$ 0,34')
+    expect(plain(formatUnitCost(0.113945))).toBe('R$ 0,1139')
   })
 })
