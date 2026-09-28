@@ -1,0 +1,60 @@
+// pt-BR formatting helpers. Money values arrive from the database as numbers
+// (numeric columns); these functions only format, they never do arithmetic.
+
+const TIME_ZONE = 'America/Sao_Paulo'
+
+const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+const percent = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+const quantity = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 3 })
+
+type Numeric = number | string | null | undefined
+
+function toNumber(value: Numeric) {
+  if (value === null || value === undefined || value === '') return null
+  const n = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(n) ? n : null
+}
+
+/** R$ 1.234,56 */
+export function formatCurrency(value: Numeric) {
+  const n = toNumber(value)
+  return n === null ? '—' : currency.format(n)
+}
+
+/** 43,81% — expects a value already in percent (43.81, not 0.4381). */
+export function formatPercent(value: Numeric) {
+  const n = toNumber(value)
+  return n === null ? '—' : `${percent.format(n)}%`
+}
+
+/** 1.000 g, 2,5 kg */
+export function formatQuantity(value: Numeric, unit?: string) {
+  const n = toNumber(value)
+  if (n === null) return '—'
+  return unit ? `${quantity.format(n)} ${unit}` : quantity.format(n)
+}
+
+/** '2026-09-28' or a timestamp → 28/09/2026 (calendar dates are not shifted by time zone). */
+export function formatDate(value: string | Date | null | undefined) {
+  if (!value) return '—'
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [y, m, d] = value.split('-')
+    return `${d}/${m}/${y}`
+  }
+  return new Intl.DateTimeFormat('pt-BR', { timeZone: TIME_ZONE }).format(new Date(value))
+}
+
+/** 28/09/2026 14:05 */
+export function formatDateTime(value: string | Date | null | undefined) {
+  if (!value) return '—'
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: TIME_ZONE,
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(new Date(value))
+}
+
+/** Today's date in Brazil as YYYY-MM-DD (what the database expects). */
+export function todayISO(now: Date = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE }).format(now)
+}
