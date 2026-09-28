@@ -22,6 +22,7 @@ export const router = createBrowserRouter([
           { path: 'produtos', lazy: page(() => import('@/features/products/pages/ProductsPage')) },
           { path: 'produtos/novo', lazy: page(() => import('@/features/products/pages/ProductFormPage')) },
           { path: 'produtos/:id', lazy: page(() => import('@/features/products/pages/ProductFormPage')) },
+          { path: 'produtos/:id/ficha', lazy: page(() => import('@/features/products/pages/CostSheetPage')) },
           { path: 'estoque', lazy: page(() => import('@/features/inventory/pages/InventoryPage')) },
           { path: 'compras', lazy: page(() => import('@/features/purchases/pages/PurchasesPage')) },
           { path: 'relatorios', element: <UpcomingPage title="Relatórios" stage={10} /> },

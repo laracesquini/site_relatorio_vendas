@@ -16,6 +16,7 @@ import { formatCurrency, formatPercent } from '@/lib/format'
 import { dashboardKeys } from '@/features/dashboard/api'
 import { inventoryKeys } from '@/features/inventory/api'
 import { productKeys } from '@/features/products/api'
+import { MaterialsPreview } from '@/features/products/costSheet/MaterialsPreview'
 import type { ProductView, VariantView } from '@/features/products/model'
 import type { Channel } from '@/features/settings/api'
 import { createSale, salesKeys, updateSale, type SaleLine } from '../api'
@@ -293,6 +294,15 @@ export function SaleForm({
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" />
             Só há {variant.currentQty} un. prontas desta variação. A venda será registrada e o estoque ficará negativo.
           </p>
+        )}
+
+        {product && variant && product.stockMode === 'made_to_order' && product.auto_deduct_materials && (
+          <MaterialsPreview
+            productId={product.id}
+            variantId={variant.id}
+            units={quantity}
+            title={editing ? 'Insumos baixados com os novos valores' : 'Insumos que serão baixados'}
+          />
         )}
 
         <Controller

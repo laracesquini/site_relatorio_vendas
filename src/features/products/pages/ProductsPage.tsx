@@ -138,6 +138,7 @@ export default function ProductsPage() {
             <ProductsTable
               products={filtered}
               onEdit={(p) => navigate(`/produtos/${p.id}`)}
+              onCostSheet={(p) => navigate(`/produtos/${p.id}/ficha`)}
               onToggleArchive={(p) => archive.mutate(p)}
               onDelete={setDeleting}
             />

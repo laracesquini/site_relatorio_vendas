@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, ClipboardList } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatCurrency, formatQuantity } from '@/lib/format'
@@ -12,11 +12,12 @@ const formatRange = ([min, max]: [number, number]) =>
 type ProductsTableProps = {
   products: ProductView[]
   onEdit: (product: ProductView) => void
+  onCostSheet: (product: ProductView) => void
   onToggleArchive: (product: ProductView) => void
   onDelete: (product: ProductView) => void
 }
 
-export function ProductsTable({ products, onEdit, onToggleArchive, onDelete }: ProductsTableProps) {
+export function ProductsTable({ products, onEdit, onCostSheet, onToggleArchive, onDelete }: ProductsTableProps) {
   return (
     <div className="overflow-x-auto rounded-xl border bg-card">
       <Table>
@@ -46,7 +47,12 @@ export function ProductsTable({ products, onEdit, onToggleArchive, onDelete }: P
               </TableCell>
               <TableCell className="font-mono text-xs">{p.sku}</TableCell>
               <TableCell className="text-right tabular-nums">{formatRange(p.priceRange)}</TableCell>
-              <TableCell className="text-right tabular-nums">{formatRange(p.costRange)}</TableCell>
+              <TableCell className="text-right tabular-nums">
+                {formatRange(p.costRange)}
+                <div className="text-xs text-muted-foreground">
+                  {p.variants.some((v) => v.costSource === 'sheet') ? 'pela ficha' : 'estimado'}
+                </div>
+              </TableCell>
               <TableCell className="text-right tabular-nums">
                 {p.stockMode === 'stocked' ? (
                   <span className="inline-flex items-center gap-1">
@@ -75,6 +81,7 @@ export function ProductsTable({ products, onEdit, onToggleArchive, onDelete }: P
               <TableCell>
                 <RowActions
                   onEdit={() => onEdit(p)}
+                  extra={[{ label: 'Ficha de custo', icon: ClipboardList, onSelect: () => onCostSheet(p) }]}
                   onToggleArchive={() => onToggleArchive(p)}
                   archived={Boolean(p.archived_at)}
                   onDelete={() => onDelete(p)}

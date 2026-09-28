@@ -1373,6 +1373,10 @@ export type Database = {
         Args: { p_from?: string; p_to?: string }
         Returns: Json
       }
+      save_cost_sheet: {
+        Args: { p: Json; p_product_id: string }
+        Returns: undefined
+      }
       save_inventory_item: { Args: { p: Json }; Returns: string }
       save_product: { Args: { p: Json }; Returns: string }
       update_purchase: {

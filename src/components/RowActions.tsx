@@ -1,4 +1,4 @@
-import { Archive, ArchiveRestore, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { Archive, ArchiveRestore, MoreHorizontal, Pencil, Trash2, type LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -10,6 +10,8 @@ import {
 
 type RowActionsProps = {
   onEdit?: () => void
+  /** Extra entries shown after "Editar". */
+  extra?: { label: string; icon: LucideIcon; onSelect: () => void }[]
   /** Archive/restore toggle; `archived` is the current state. */
   onToggleArchive?: () => void
   archived?: boolean
@@ -20,6 +22,7 @@ type RowActionsProps = {
 
 export function RowActions({
   onEdit,
+  extra = [],
   onToggleArchive,
   archived,
   archiveLabel = 'Arquivar',
@@ -39,6 +42,11 @@ export function RowActions({
             <Pencil /> Editar
           </DropdownMenuItem>
         )}
+        {extra.map(({ label, icon: Icon, onSelect }) => (
+          <DropdownMenuItem key={label} onSelect={onSelect}>
+            <Icon /> {label}
+          </DropdownMenuItem>
+        ))}
         {onToggleArchive && (
           <DropdownMenuItem onSelect={onToggleArchive}>
             {archived ? <ArchiveRestore /> : <Archive />}

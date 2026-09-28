@@ -109,7 +109,7 @@ export function PricingSection({ form, defaultVariant }: SectionProps & { defaul
         hint={
           defaultVariant && !hasVariations && defaultVariant.costSource === 'sheet'
             ? `A ficha de custo define o custo atual: ${formatCurrency(defaultVariant.unitCost)}.`
-            : 'Usado quando o produto não tem ficha de custo.'
+            : 'Usado enquanto o produto não tem ficha de custo (insumos por peça).'
         }
       >
         <Controller

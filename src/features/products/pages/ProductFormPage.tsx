@@ -2,7 +2,7 @@ import { useEffect, type ReactNode } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, ClipboardList, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageHeader } from '@/components/PageHeader'
@@ -33,7 +33,18 @@ export default function ProductFormPage() {
           <ArrowLeft /> Produtos
         </Link>
       </Button>
-      <PageHeader title={id ? 'Editar produto' : 'Novo produto'} />
+      <PageHeader
+        title={id ? 'Editar produto' : 'Novo produto'}
+        actions={
+          id && (
+            <Button asChild variant="outline">
+              <Link to={`/produtos/${id}/ficha`}>
+                <ClipboardList /> Ficha de custo
+              </Link>
+            </Button>
+          )
+        }
+      />
       {id && product.isLoading ? (
         <LoadingRows rows={8} />
       ) : id && product.error ? (

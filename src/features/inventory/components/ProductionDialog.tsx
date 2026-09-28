@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { DecimalInput } from '@/components/DecimalInput'
 import { Field } from '@/components/Field'
 import { formatQuantity, todayISO } from '@/lib/format'
+import { MaterialsPreview } from '@/features/products/costSheet/MaterialsPreview'
 import { registerProduction, type FinishedGood } from '../api'
 import { useStockMutation } from '../hooks'
 
@@ -66,8 +67,8 @@ function ProductionForm({ variant, onClose }: { variant: FinishedGood; onClose: 
         </DialogDescription>
       </DialogHeader>
       <p className="text-sm text-muted-foreground">
-        As peças entram no estoque pronto, e os insumos da ficha de custo do produto são baixados. O custo das peças
-        fica registrado com o custo médio atual dos insumos.
+        As peças entram no estoque pronto e os insumos da ficha de custo são baixados. O custo das peças fica
+        registrado com o custo médio atual dos insumos.
       </p>
       <div className="grid grid-cols-2 gap-4">
         <Field label="Peças produzidas" htmlFor="prod-qty" error={error ?? undefined}>
@@ -77,6 +78,12 @@ function ProductionForm({ variant, onClose }: { variant: FinishedGood; onClose: 
           <Input id="prod-date" type="date" value={date} max={todayISO()} onChange={(e) => setDate(e.target.value || todayISO())} />
         </Field>
       </div>
+      <MaterialsPreview
+        productId={variant.productId}
+        variantId={variant.id}
+        units={quantity ?? 0}
+        title="Insumos que serão consumidos"
+      />
       <Field label="Observações" htmlFor="prod-notes">
         <Textarea id="prod-notes" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
       </Field>
