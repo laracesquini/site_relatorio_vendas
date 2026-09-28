@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { formatCurrency, formatDate, formatPercent, formatQuantity, todayISO } from './format'
+import {
+  formatBucket,
+  formatCurrency,
+  formatCurrencyCompact,
+  formatDate,
+  formatMonthLong,
+  formatPercent,
+  formatQuantity,
+  todayISO,
+} from './format'
 
 // Intl uses a non-breaking space between "R$" and the number.
 const plain = (s: string) => s.replaceAll(String.fromCharCode(160), ' ')
@@ -29,5 +38,16 @@ describe('format', () => {
   it('gives today in Brazil, not UTC', () => {
     // 01:30 UTC on the 29th is still the 28th in São Paulo (UTC-3)
     expect(todayISO(new Date('2026-09-29T01:30:00Z'))).toBe('2026-09-28')
+  })
+
+  it('formats compact currency for chart axes', () => {
+    expect(plain(formatCurrencyCompact(950))).toBe('R$ 950')
+    expect(plain(formatCurrencyCompact(1200))).toBe('R$ 1,2 mil')
+  })
+
+  it('formats chart buckets', () => {
+    expect(formatBucket('2026-09-02', 'day')).toBe('02/09')
+    expect(formatBucket('2026-09-01', 'month')).toBe('set/26')
+    expect(formatMonthLong('2026-09-01')).toBe('setembro de 2026')
   })
 })

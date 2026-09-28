@@ -17,7 +17,7 @@ export const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
-          { index: true, element: <UpcomingPage title="Dashboard" stage={6} /> },
+          { index: true, lazy: page(() => import('@/features/dashboard/pages/DashboardPage')) },
           { path: 'vendas', lazy: page(() => import('@/features/sales/pages/SalesPage')) },
           { path: 'produtos', lazy: page(() => import('@/features/products/pages/ProductsPage')) },
           { path: 'produtos/novo', lazy: page(() => import('@/features/products/pages/ProductFormPage')) },

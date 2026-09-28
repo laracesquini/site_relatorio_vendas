@@ -15,6 +15,20 @@ function toNumber(value: Numeric) {
   return Number.isFinite(n) ? n : null
 }
 
+const compactCurrency = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+  notation: 'compact',
+  maximumFractionDigits: 1,
+})
+
+/** Axis labels: R$ 950, R$ 1,2 mil, R$ 3,4 mi */
+export function formatCurrencyCompact(value: Numeric) {
+  const n = toNumber(value)
+  if (n === null) return '—'
+  return Math.abs(n) < 1000 ? currency.format(n).replace(/,00$/, '') : compactCurrency.format(n)
+}
+
 /** R$ 1.234,56 */
 export function formatCurrency(value: Numeric) {
   const n = toNumber(value)
@@ -42,6 +56,22 @@ export function formatDate(value: string | Date | null | undefined) {
     return `${d}/${m}/${y}`
   }
   return new Intl.DateTimeFormat('pt-BR', { timeZone: TIME_ZONE }).format(new Date(value))
+}
+
+const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
+
+/** '2026-09-02' → 02/09 (day) or set/26 (month). */
+export function formatBucket(value: string, bucket: 'day' | 'month') {
+  const [y, m, d] = value.slice(0, 10).split('-')
+  return bucket === 'month' ? `${MONTHS[Number(m) - 1]}/${y.slice(2)}` : `${d}/${m}`
+}
+
+/** '2026-09-01' → setembro de 2026 */
+export function formatMonthLong(value: string) {
+  const [y, m] = value.split('-').map(Number)
+  return new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(y, m - 1, 1)),
+  )
 }
 
 /** 28/09/2026 14:05 */

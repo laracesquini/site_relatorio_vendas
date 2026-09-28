@@ -13,6 +13,7 @@ import { calculateSale } from '@/domain/sale'
 import { dec, roundMoney } from '@/domain/decimal'
 import { useAppMutation } from '@/lib/api'
 import { formatCurrency, formatPercent } from '@/lib/format'
+import { dashboardKeys } from '@/features/dashboard/api'
 import { productKeys } from '@/features/products/api'
 import type { ProductView, VariantView } from '@/features/products/model'
 import type { Channel } from '@/features/settings/api'
@@ -85,7 +86,7 @@ export function SaleForm({
   const save = useAppMutation({
     mutationFn: (v: SaleFormValues) =>
       editing ? updateSale(editing.sale_id!, toCreateSalePayload(v)) : createSale(toCreateSalePayload(v)),
-    invalidate: [salesKeys.all, productKeys.all],
+    invalidate: [salesKeys.all, productKeys.all, dashboardKeys.all],
     successMessage: editing ? 'Venda atualizada' : 'Venda registrada',
     onSuccess: (_, v) => {
       if (!editing) storeLastChannel(v.channel_id)

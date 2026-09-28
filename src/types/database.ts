@@ -991,6 +991,19 @@ export type Database = {
       }
     }
     Views: {
+      low_stock: {
+        Row: {
+          current_qty: number | null
+          detail: string | null
+          id: string | null
+          kind: string | null
+          min_qty: number | null
+          name: string | null
+          shortfall: number | null
+          unit: string | null
+        }
+        Relationships: []
+      }
       sale_lines: {
         Row: {
           category_id: string | null
@@ -1066,6 +1079,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      stock_value: {
+        Row: {
+          finished_products: number | null
+          materials: number | null
+        }
+        Relationships: []
       }
       variant_costs: {
         Row: {
@@ -1158,6 +1178,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      report_overview: {
+        Args: { p_from?: string; p_to?: string }
+        Returns: Json
       }
       save_product: { Args: { p: Json }; Returns: string }
       update_purchase: {
