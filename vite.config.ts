@@ -16,4 +16,7 @@ export default defineConfig({
     include: ['src/**/*.test.{ts,tsx}', 'supabase/tests/**/*.test.ts'],
     testTimeout: 60000,
   },
+  server: {
+    port: 5175
+  }
 })
