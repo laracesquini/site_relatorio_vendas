@@ -1,163 +1,153 @@
 @import "tailwindcss";
 
+/* Dark mode follows the `.dark` class on <html> (set by ThemeProvider) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   :root {
     /* Base */
-    --background: oklch(0.17 0.006 264);
-    --foreground: oklch(0.94 0.004 264);
-    --common: var(--foreground);
+    --background: oklch(0.985 0.002 264);
+    --foreground: oklch(0.21 0.006 264);
 
     /* Superfícies */
-    --card: oklch(0.22 0.006 264);
+    --card: oklch(1 0 0);
     --card-foreground: var(--foreground);
-
-    --popover: oklch(0.25 0.006 264);
+    --popover: oklch(1 0 0);
     --popover-foreground: var(--foreground);
 
     /* Marca */
+    --primary: oklch(0.24 0.008 264);
+    --primary-foreground: oklch(0.98 0.002 264);
+
+    /* Elementos secundários */
+    --secondary: oklch(0.955 0.004 264);
+    --secondary-foreground: var(--foreground);
+    --accent: oklch(0.955 0.004 264);
+    --accent-foreground: var(--foreground);
+    --muted: oklch(0.955 0.004 264);
+    --muted-foreground: oklch(0.5 0.014 264);
+
+    /* Estados */
+    --success: oklch(0.56 0.13 162);
+    --success-foreground: white;
+    --danger: oklch(0.58 0.21 27);
+    --danger-foreground: white;
+    --destructive: var(--danger);
+    --warning: oklch(0.72 0.16 75);
+    --warning-foreground: oklch(0.25 0.06 75);
+
+    /* Inputs */
+    --border: oklch(0.91 0.005 264);
+    --input: oklch(0.88 0.006 264);
+    --ring: oklch(0.6 0.014 264);
+
+    --radius: 0.75rem;
+
+    /* Charts: categorical slots validated for color-blind separation and
+       3:1 contrast on the card surface (light #ffffff / dark card). */
+    --chart-1: #2a78d6;
+    --chart-2: #eb6834;
+    --chart-3: #1baf7a;
+    --chart-4: #eda100;
+    --chart-5: #e87ba4;
+    --chart-grid: oklch(0.93 0.004 264);
+
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.05), 0 4px 16px rgb(0 0 0 / 0.04);
+    --shadow-elevated: 0 20px 50px rgb(0 0 0 / 0.12);
+
+    --soft-alpha: 14%;
+  }
+
+  .dark {
+    --background: oklch(0.17 0.006 264);
+    --foreground: oklch(0.94 0.004 264);
+
+    --card: oklch(0.22 0.006 264);
+    --card-foreground: var(--foreground);
+    --popover: oklch(0.25 0.006 264);
+    --popover-foreground: var(--foreground);
+
     --primary: oklch(0.94 0.004 264);
     --primary-foreground: oklch(0.17 0.006 264);
 
-    /* Elementos secundários */
     --secondary: oklch(0.25 0.006 264);
     --secondary-foreground: var(--foreground);
-
-    --accent: oklch(0.25 0.006 264);
+    --accent: oklch(0.27 0.006 264);
     --accent-foreground: var(--foreground);
-
     --muted: oklch(0.25 0.006 264);
     --muted-foreground: oklch(0.65 0.014 264);
 
-    /* Estados */
     --success: oklch(0.78 0.15 162);
     --success-foreground: oklch(0.18 0.05 162);
-
     --danger: oklch(0.63 0.21 27);
     --danger-foreground: white;
+    --warning: oklch(0.85 0.16 90);
+    --warning-foreground: oklch(0.3 0.09 75);
 
-    --warning: oklch(0.93 0.18 100);
-    --warning-foreground: oklch(0.30 0.09 275);
-
-    /* Inputs */
-    --border: oklch(0.30 0.008 264);
-    --input: var(--border);
+    --border: oklch(0.3 0.008 264);
+    --input: oklch(0.33 0.008 264);
     --ring: oklch(0.65 0.014 264);
 
-    --radius: 1rem;
+    --chart-1: #3987e5;
+    --chart-2: #d95926;
+    --chart-3: #199e70;
+    --chart-4: #c98500;
+    --chart-5: #d55181;
+    --chart-grid: oklch(0.28 0.006 264);
 
-    /* Charts */
-    --chart-1: oklch(0.63 0.21 33);
-    /* shopee — laranja */
-    --chart-2: oklch(0.93 0.18 100);
-    /* mercado livre — amarelo */
-    --chart-3: oklch(0.78 0.15 162);
-    /* pessoalmente — verde */
-    --chart-4: oklch(0.40 0.02 264);
-    /* bruto — neutro */
-    --chart-5: oklch(0.63 0.21 27);
-    /* taxas — vermelho */
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.18);
+    --shadow-elevated: 0 20px 50px rgb(0 0 0 / 0.35);
 
-    /* Shadows */
-    --shadow-card:
-      0 1px 2px rgb(0 0 0 / .35),
-      0 8px 24px rgb(0 0 0 / .18);
-
-    --shadow-elevated:
-      0 20px 50px rgb(0 0 0 / .35);
-
-    /* Soft Colors */
     --soft-alpha: 18%;
+  }
 
-    --soft-primary: color-mix(in oklch,
-        var(--primary) var(--soft-alpha),
-        transparent);
+  :root,
+  .dark {
+    --soft-success: color-mix(in oklch, var(--success) var(--soft-alpha), transparent);
+    --soft-danger: color-mix(in oklch, var(--danger) var(--soft-alpha), transparent);
+    --soft-warning: color-mix(in oklch, var(--warning) var(--soft-alpha), transparent);
+  }
 
-    --soft-secondary: color-mix(in oklch,
-        var(--secondary) var(--soft-alpha),
-        transparent);
-
-    --soft-success: color-mix(in oklch,
-        var(--success) var(--soft-alpha),
-        transparent);
-
-    --soft-danger: color-mix(in oklch,
-        var(--danger) var(--soft-alpha),
-        transparent);
-
-    --soft-warning: color-mix(in oklch,
-        var(--warning) var(--soft-alpha),
-        transparent);
-
-    /* Canais de venda (marketplaces) */
-    --channel-shopee: oklch(0.63 0.21 33);
-    --channel-shopee-foreground: white;
-
-    --channel-mercado-livre: oklch(0.93 0.18 100);
-    --channel-mercado-livre-foreground: oklch(0.30 0.09 275);
-
-    --channel-pessoal: var(--success);
-    --channel-pessoal-foreground: var(--success-foreground);
-
-    --soft-channel-shopee: color-mix(in oklch,
-        var(--channel-shopee) var(--soft-alpha),
-        transparent);
-
-    --soft-channel-mercado-livre: color-mix(in oklch,
-        var(--channel-mercado-livre) var(--soft-alpha),
-        transparent);
-
-    --soft-channel-pessoal: color-mix(in oklch,
-        var(--channel-pessoal) var(--soft-alpha),
-        transparent);
+  * {
+    @apply border-border outline-ring/50;
   }
 }
 
-@theme {
-
-  --font-sans:
-    "Inter",
-    ui-sans-serif,
-    system-ui,
-    sans-serif;
-
-  --font-heading:
-    "Space Grotesk",
-    sans-serif;
-
-  --font-mono:
-    "JetBrains Mono",
-    monospace;
+@theme inline {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Space Grotesk", "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
   --color-background: var(--background);
-  --color-common: var(--common);
+  --color-foreground: var(--foreground);
+  --color-common: var(--foreground);
 
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
 
   --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-destructive: var(--destructive);
   --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
 
   --color-border: var(--border);
+  --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --color-soft-primary: var(--soft-primary);
-  --color-soft-secondary: var(--soft-secondary);
   --color-soft-success: var(--soft-success);
   --color-soft-danger: var(--soft-danger);
   --color-soft-warning: var(--soft-warning);
@@ -167,22 +157,12 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-chart-grid: var(--chart-grid);
 
-  /* Canais de venda */
-  --color-channel-shopee: var(--channel-shopee);
-  --color-channel-shopee-foreground: var(--channel-shopee-foreground);
-
-  --color-channel-mercado-livre: var(--channel-mercado-livre);
-  --color-channel-mercado-livre-foreground: var(--channel-mercado-livre-foreground);
-
-  --color-channel-pessoal: var(--channel-pessoal);
-  --color-channel-pessoal-foreground: var(--channel-pessoal-foreground);
-
-  --color-soft-channel-shopee: var(--soft-channel-shopee);
-  --color-soft-channel-mercado-livre: var(--soft-channel-mercado-livre);
-  --color-soft-channel-pessoal: var(--soft-channel-pessoal);
-
-  --radius: var(--radius);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 
   --shadow-card: var(--shadow-card);
   --shadow-elevated: var(--shadow-elevated);
@@ -190,6 +170,7 @@
 
 html,
 body {
-  @apply bg-background text-common antialiased;
+  @apply bg-background text-foreground antialiased;
   font-family: var(--font-sans);
+  font-feature-settings: "tnum" 1;
 }
