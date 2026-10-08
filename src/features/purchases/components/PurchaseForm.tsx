@@ -60,7 +60,7 @@ export function PurchaseForm({ initial, purchaseId, items, categories, suppliers
   const itemsError = form.formState.errors.items?.message ?? form.formState.errors.items?.root?.message
 
   return (
-    <form onSubmit={form.handleSubmit((v) => save.mutate(v))} noValidate className="flex h-full flex-col">
+    <form onSubmit={form.handleSubmit((v) => save.mutate(v))} noValidate className="flex min-h-0 flex-1 flex-col">
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-4 sm:px-6">
         <div className="grid grid-cols-2 gap-4">
           <Field label="Data" htmlFor="purchase_date" error={form.formState.errors.purchase_date?.message}>
