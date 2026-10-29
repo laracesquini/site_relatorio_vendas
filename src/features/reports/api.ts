@@ -44,6 +44,9 @@ export type CashPoint = {
   sales_in: number
   other_in: number
   inflows: number
+  purchases_out: number
+  withdrawals: number
+  /** purchases_out + withdrawals */
   outflows: number
   net: number
   cumulative: number
@@ -53,11 +56,20 @@ export type CashFlow = {
   from: string
   to: string
   bucket: Bucket
-  totals: { sales_in: number; other_in: number; inflows: number; outflows: number; balance: number }
+  totals: {
+    sales_in: number
+    other_in: number
+    inflows: number
+    purchases_out: number
+    withdrawals: number
+    outflows: number
+    balance: number
+  }
   series: CashPoint[]
 }
 
 export type OtherIncome = Tables<'other_incomes'>
+export type CashWithdrawal = Tables<'cash_withdrawals'>
 
 export type ReportQuery = { from: string | null; to: string | null; bucket: Bucket | null }
 
@@ -66,6 +78,7 @@ export const reportKeys = {
   details: (q: ReportQuery) => [...reportKeys.all, 'details', q] as const,
   cashFlow: (q: ReportQuery) => [...reportKeys.all, 'cash-flow', q] as const,
   otherIncomes: (from: string | null, to: string | null) => [...reportKeys.all, 'other-incomes', from, to] as const,
+  withdrawals: (from: string | null, to: string | null) => [...reportKeys.all, 'withdrawals', from, to] as const,
 }
 
 const rangeArgs = ({ from, to, bucket }: ReportQuery) => ({
@@ -98,7 +111,25 @@ export function saveOtherIncome(values: { id?: string; income_date: string; desc
 export const deleteOtherIncome = (id: string) =>
   unwrap(supabase.from('other_incomes').update({ deleted_at: new Date().toISOString() }).eq('id', id))
 
-export const useReportDetails = (q: ReportQuery) =>
+export function listWithdrawals(from: string | null, to: string | null) {
+  let query = supabase.from('cash_withdrawals').select('*').is('deleted_at', null).order('withdrawal_date', { ascending: false })
+  if (from) query = query.gte('withdrawal_date', from)
+  if (to) query = query.lte('withdrawal_date', to)
+  return unwrap(query)
+}
+
+export function saveWithdrawal(values: { id?: string; withdrawal_date: string; description: string; amount: number; notes: string | null }) {
+  const { id, ...row } = values
+  return id
+    ? unwrap(supabase.from('cash_withdrawals').update(row).eq('id', id))
+    : unwrap(supabase.from('cash_withdrawals').insert(row))
+}
+
+/** Soft delete, like other income. */
+export const deleteWithdrawal = (id: string) =>
+  unwrap(supabase.from('cash_withdrawals').update({ deleted_at: new Date().toISOString() }).eq('id', id))
+
+export const useReportDetails =(q: ReportQuery) =>
   useQuery({ queryKey: reportKeys.details(q), queryFn: () => getReportDetails(q), placeholderData: keepPreviousData })
 
 export const useCashFlow = (q: ReportQuery) =>
@@ -106,3 +137,6 @@ export const useCashFlow = (q: ReportQuery) =>
 
 export const useOtherIncomes = (from: string | null, to: string | null) =>
   useQuery({ queryKey: reportKeys.otherIncomes(from, to), queryFn: () => listOtherIncomes(from, to) })
+
+export const useWithdrawals = (from: string | null, to: string | null) =>
+  useQuery({ queryKey: reportKeys.withdrawals(from, to), queryFn: () => listWithdrawals(from, to) })

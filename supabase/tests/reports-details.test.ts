@@ -86,7 +86,34 @@ describe('report_cash_flow', () => {
     await seed()
     await t.db.query(`insert into other_incomes (income_date, description, amount) values ('2026-09-15', 'Aula de impressão 3D', 80)`)
     const r = await cash('2026-09-01', '2026-09-30', 'month')
-    expect(r.totals).toEqual({ sales_in: 64.4, other_in: 80, inflows: 144.4, outflows: 178.9, balance: -34.5 })
+    expect(r.totals).toEqual({
+      sales_in: 64.4, other_in: 80, inflows: 144.4, purchases_out: 178.9, withdrawals: 0, outflows: 178.9, balance: -34.5,
+    })
+  })
+
+  it('subtracts withdrawals from cash, but not from profit', async () => {
+    await seed()
+    await t.db.query(`insert into cash_withdrawals (withdrawal_date, description, amount) values ('2026-09-10', 'Pró-labore', 20)`)
+    await t.db.query(`insert into cash_withdrawals (withdrawal_date, description, amount, deleted_at) values ('2026-09-10', 'X', 99, now())`)
+    const r = await cash('2026-09-01', '2026-09-30', 'month')
+    expect(r.totals).toMatchObject({ purchases_out: 178.9, withdrawals: 20, outflows: 198.9, balance: -134.5 })
+    const day = await cash('2026-09-10', '2026-09-10')
+    expect((day.series as Json[])[0]).toMatchObject({ sales_in: 15, withdrawals: 20, net: -5 })
+    const profit = await t.one<{ p: string }>(`select sum(profit) as p from sale_lines`)
+    expect(Number(profit.p)).toBe(45.5)
+  })
+
+  it('starts the open range at the first withdrawal', async () => {
+    await t.db.query(`insert into cash_withdrawals (withdrawal_date, description, amount) values ('2026-08-20', 'Retirada', 10)`)
+    const r = await cash(null, '2026-08-31')
+    expect(r.from).toBe('2026-08-20')
+    expect((r.totals as Json).balance).toBe(-10)
+  })
+
+  it('rejects an empty withdrawal', async () => {
+    await expect(
+      t.db.query(`insert into cash_withdrawals (withdrawal_date, description, amount) values ('2026-09-10', 'X', 0)`),
+    ).rejects.toThrow()
   })
 
   it('is not the same as profit: the filament purchase is cash out now', async () => {
