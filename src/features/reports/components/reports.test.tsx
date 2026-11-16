@@ -14,6 +14,7 @@ vi.mock('../api', async (orig) => ({
   ...(await orig<typeof import('../api')>()),
   useCashFlow: () => ({ data: sampleCashFlow, isLoading: false, isFetching: false, error: null }),
   useOtherIncomes: () => ({ data: [], isLoading: false, error: null }),
+  useWithdrawals: () => ({ data: [], isLoading: false, error: null }),
 }))
 
 const { ResultsTab } = await import('./ResultsTab')
@@ -80,6 +81,7 @@ describe('CashFlowTab', () => {
     const strip = 'Fluxo de caixa do período'
     expect(stat(strip, 'Entradas')).toHaveTextContent('R$ 144,40')
     expect(stat(strip, 'Saídas')).toHaveTextContent('R$ 223,01')
+    expect(stat(strip, 'Saídas')).toHaveTextContent('R$ 50,00 em retiradas')
     expect(stat(strip, 'Saldo')).toHaveTextContent('-R$ 78,61')
     expect(stat(strip, 'Lucro das vendas')).toHaveTextContent('R$ 45,50')
     expect(screen.getByText(/Saldo de caixa não é lucro/)).toBeInTheDocument()

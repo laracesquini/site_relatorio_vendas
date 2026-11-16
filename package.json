@@ -10,8 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:push": "supabase db push",
-    "db:types": "supabase gen types typescript --linked --schema public > src/types/database.ts"
+    "db:push": "npx supabase db push",
+    "db:types": "npx supabase gen types typescript --linked --schema public > src/types/database.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

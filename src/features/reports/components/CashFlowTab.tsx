@@ -8,6 +8,7 @@ import { sumFields } from '../totals'
 import { OtherIncomes } from './OtherIncomes'
 import { ReportTable, type ReportColumn } from './ReportTable'
 import { StatStrip } from './StatStrip'
+import { Withdrawals } from './Withdrawals'
 
 const SERIES: Series[] = [
   { key: 'inflows', label: 'Entradas', color: 'var(--chart-1)' },
@@ -18,7 +19,8 @@ const COLUMNS: ReportColumn<CashPoint>[] = [
   { label: 'Período', value: (r) => r.date, format: 'bucket' },
   { label: 'Vendas recebidas', value: (r) => r.sales_in, format: 'currency' },
   { label: 'Outras entradas', value: (r) => r.other_in, format: 'currency' },
-  { label: 'Saídas', value: (r) => r.outflows, format: 'currency' },
+  { label: 'Compras e despesas', value: (r) => r.purchases_out, format: 'currency' },
+  { label: 'Retiradas', value: (r) => r.withdrawals, format: 'currency' },
   { label: 'Saldo', value: (r) => r.net, format: 'currency', strong: true, signed: true },
   { label: 'Acumulado', value: (r) => r.cumulative, format: 'currency', signed: true },
 ]
@@ -40,7 +42,7 @@ export function CashFlowTab({ query, details }: { query: ReportQuery; details?: 
         label="Fluxo de caixa do período"
         stats={[
           { label: 'Entradas', value: formatCurrency(totals.inflows), hint: `${formatCurrency(totals.other_in)} fora de vendas` },
-          { label: 'Saídas', value: formatCurrency(totals.outflows), hint: 'Compras e despesas' },
+          { label: 'Saídas', value: formatCurrency(totals.outflows), hint: `${formatCurrency(totals.withdrawals)} em retiradas` },
           {
             label: 'Saldo',
             value: formatCurrency(totals.balance),
@@ -75,9 +77,10 @@ export function CashFlowTab({ query, details }: { query: ReportQuery; details?: 
         rowKey={(r) => r.date}
         bucket={bucket}
         filename={`fluxo-de-caixa_${from}_${to}`}
-        totals={['Total', totals.sales_in, totals.other_in, totals.outflows, totals.balance, undefined]}
+        totals={['Total', totals.sales_in, totals.other_in, totals.purchases_out, totals.withdrawals, totals.balance, undefined]}
       />
       <OtherIncomes from={from} to={to} />
+      <Withdrawals from={from} to={to} />
     </div>
   )
 }

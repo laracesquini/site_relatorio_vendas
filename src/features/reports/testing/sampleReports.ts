@@ -39,10 +39,10 @@ export const sampleCashFlow: CashFlow = {
   from: '2026-09-01',
   to: '2026-09-30',
   bucket: 'week',
-  totals: { sales_in: 64.4, other_in: 80, inflows: 144.4, outflows: 223.01, balance: -78.61 },
+  totals: { sales_in: 64.4, other_in: 80, inflows: 144.4, purchases_out: 173.01, withdrawals: 50, outflows: 223.01, balance: -78.61 },
   series: [
-    { date: '2026-08-31', sales_in: 19.4, other_in: 0, inflows: 19.4, outflows: 138.9, net: -119.5, cumulative: -119.5 },
-    { date: '2026-09-07', sales_in: 45, other_in: 0, inflows: 45, outflows: 40, net: 5, cumulative: -114.5 },
-    { date: '2026-09-14', sales_in: 0, other_in: 80, inflows: 80, outflows: 44.11, net: 35.89, cumulative: -78.61 },
+    { date: '2026-08-31', sales_in: 19.4, other_in: 0, inflows: 19.4, purchases_out: 138.9, withdrawals: 0, outflows: 138.9, net: -119.5, cumulative: -119.5 },
+    { date: '2026-09-07', sales_in: 45, other_in: 0, inflows: 45, purchases_out: 0, withdrawals: 40, outflows: 40, net: 5, cumulative: -114.5 },
+    { date: '2026-09-14', sales_in: 0, other_in: 80, inflows: 80, purchases_out: 34.11, withdrawals: 10, outflows: 44.11, net: 35.89, cumulative: -78.61 },
   ],
 }

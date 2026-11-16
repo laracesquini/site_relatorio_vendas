@@ -148,7 +148,7 @@ export function SaleForm({
   const submit = form.handleSubmit((v) => save.mutate(v))
 
   return (
-    <form onSubmit={submit} noValidate className="flex h-full flex-col">
+    <form onSubmit={submit} noValidate className="flex min-h-0 flex-1 flex-col">
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-4 sm:px-6">
         <Field label="Produto" htmlFor="product" error={errors.product_id?.message}>
           <ProductPicker
